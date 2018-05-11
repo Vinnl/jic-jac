@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<link rel="preload" as="image" href="https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2FUnclapped.png?1526032214234">
+<link rel="preload" as="image" href="https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2FClap.png?1526031557570">
+<link rel="preload" as="image" href="https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2FClap.png?1526031557570">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css"/>
+<style>
+  #clapper {
+    background-color: transparent;
+    background-image: url('https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2FUnclapped.png?1526035248538');
+    background-position: center;
+    background-size: 90%;
+    background-repeat: no-repeat;
+    width: 50px;
+    height: 50px;
+    border: 0 transparent none;
+    cursor: pointer;
+  }
+  
+  /* Preload the hover background image */
+  #clapper:after {
+    position: absolute; width:0; height:0; overflow: hidden; z-index: -1;
+    content:url('https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2FClap.png?1526031557570');
+  }
+  
+  #clapper:hover, #clapper:focus {
+    background-image: url('https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2FClap.png?1526031557570');
+    background-size: 95%;
+    outline: none;
+  }
+  
+  #clapper.clapped {
+    background-image: url('https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2FClap.png?1526031557570');
+  }
+  
+  #clapper.signin {
+    background-image: url('https://cdn.glitch.com/6c1d3a87-cb07-4358-b401-b6801df7ffbe%2Forcid_64x64.png?1526044774048');
+    background-size: 60%;
+  }
+</style>
+<meta charset="utf-8">
+
+<button type="button" id="clapper" class="{{#if clapped}}clapped{{/if}}"></button>
+
+<script>
+let claps = {{claps.length}}
+      
+const text = () => claps ? claps : ''
+  
+const button = document.querySelector('#clapper')
+
+const authorize = () => {
+  button.removeEventListener('click', authorize)
+  button.addEventListener('click', clap)
+  button.classList.remove('signin');
+  
+  const authWindow = window.open('/orcid')
+
+  const interval = window.setInterval(() => {
+    if (authWindow.closed) {
+      window.clearInterval(interval)
+      clap()
+    }
+  }, 100)
+}
+
+const authoriseWithCallback = (callback) => {
+  const authWindow = window.open('/orcid')
+
+  const interval = window.setInterval(() => {
+    if (authWindow.closed) {
+      window.clearInterval(interval)
+      callback()
+    }
+  }, 100)
+};
+
+const clap = () => {  
+  fetch('/claps', { 
+    method: 'POST', 
+    body: JSON.stringify({ 
+      doi: '{{doi}}',
+      type: 'clap',
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'same-origin',
+  }).then((response) => {    
+    if (response.ok) {
+      button.classList.add('clapped')
+      claps++
+      button.textContent = text()
+    } else if (response.status === 403) {
+      button.classList.add('signin')
+      button.textContent = '';
+      button.removeEventListener('click', clap)
+      button.addEventListener('click', authorize)
+    } else {
+      alert(response.statusText)
+    }
+  })
+}
+
+button.textContent = text()
+button.addEventListener('click', clap)
+</script>

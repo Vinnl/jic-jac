@@ -1,0 +1,32 @@
+{
+  "name": "jic-jacs",
+  "version": "0.0.1",
+  "description": "A research clap-o-meter",
+  "main": "src",
+  "scripts": {
+    "start": "node src"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "sqlite3": "^4.0.0",
+    "sequelize": "^4.37.7",
+    "connect-sqlite3": "^0.9.11",
+    "express-session": "^1.15.6",
+    "openid-client": "^2.0.1",
+    "passport": "^0.4.0",
+    "body-parser": "^1.18.2",
+    "express-handlebars": "^3.0.0",
+    "request": "^2.85.0",
+    "cheerio": "^0.22.0",
+    "uuid": "^3.2.1",
+    "node-fetch": "^2.1.2",
+    "moment": "^2.22.1"
+  },
+  "engines": {
+    "node": "9.x"
+  },
+  "repository": {
+    "url": "https://jic-jacs.glitch.me/"
+  },
+  "license": "MIT"
+}
